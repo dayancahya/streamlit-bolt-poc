@@ -6,7 +6,7 @@ import json # Ensure this is here, although not strictly needed for this basic a
 # --- 1. CONFIGURATION (REPLACE THIS URL ONLY) ---
 # The Roboflow API Endpoint URL (from the 'Hosted API' section, without the API key)
 # Example: "https://detect.roboflow.com/your-project-name/version-number?"
-API_URL = "YOUR_ROBOFLOW_API_ENDPOINT_URL_WITHOUT_THE_API_KEY" 
+API_URL = "https://serverless.roboflow.com/samatortrial/workflows/find-bolts" 
 
 # --- 2. STREAMLIT APP LAYOUT ---
 st.set_page_config(page_title="Vision AI Bolt Counter", layout="wide")
@@ -61,3 +61,4 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
