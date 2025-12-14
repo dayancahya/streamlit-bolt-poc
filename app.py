@@ -23,27 +23,27 @@ if uploaded_file is not None:
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
     # --- 4. API CALL TO ROBOFLOW (CORRECTED FOR JSON PAYLOAD) ---
-        try:
-            with st.spinner('Sending image to Vision AI for counting...'):
-                api_key = st.secrets["roboflow"]["api_key"]
-                full_url = f"{API_URL}?api_key={api_key}"
-                
-                # 1. DEFINE THE JSON PAYLOAD STRUCTURE
-                payload = {
-                    "image": {
-                        "type": "base64",
-                        "value": image_base64  # Use the base64 string we prepared earlier
-                    }
+    try:
+        with st.spinner('Sending image to Vision AI for counting...'):
+            api_key = st.secrets["roboflow"]["api_key"]
+            full_url = f"{API_URL}?api_key={api_key}"
+            
+            # 1. DEFINE THE JSON PAYLOAD STRUCTURE
+            payload = {
+                "image": {
+                    "type": "base64",
+                    "value": image_base64  # Use the base64 string we prepared earlier
                 }
-                
-                # 2. SEND THE REQUEST WITH JSON
-                response = requests.post(
-                    full_url,
-                    data=json.dumps(payload), # Use json.dumps to send the payload as a JSON string
-                    # 3. CRUCIAL: Set content type to application/json
-                    headers={"Content-Type": "application/json"} 
-                )
-                response.raise_for_status() 
+            }
+            
+            # 2. SEND THE REQUEST WITH JSON
+            response = requests.post(
+                full_url,
+                data=json.dumps(payload), # Use json.dumps to send the payload as a JSON string
+                # 3. CRUCIAL: Set content type to application/json
+                headers={"Content-Type": "application/json"} 
+            )
+            response.raise_for_status() 
                 
     except requests.exceptions.RequestException as e:
         # Handle connection errors, 401 Unauthorized, 404 Not Found, etc.
@@ -66,6 +66,7 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
 
 
 
