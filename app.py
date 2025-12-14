@@ -29,7 +29,8 @@ if uploaded_file is not None:
             api_key = st.secrets["roboflow"]["api_key"]
             
             # Construct the final URL with the API Key appended as a query parameter
-            full_url = f"{API_URL}&api_key={api_key}"
+            # Add parameters using standard URL format (using '?')
+            full_url = f"{API_URL}?api_key={api_key}"
             
             # Send the base64 image string as the POST body
             response = requests.post(
@@ -61,4 +62,5 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
 
