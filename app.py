@@ -22,28 +22,30 @@ if uploaded_file is not None:
     # Convert image bytes to a base64 string, as required by the Roboflow API body
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-    # --- 4. API CALL TO ROBOFLOW (CORRECTED FOR JSON PAYLOAD) ---
+    # --- 4. API CALL TO ROBOFLOW (DEFINITIVE WORKFLOW PAYLOAD & URL) ---
     try:
         with st.spinner('Sending image to Vision AI for counting...'):
             api_key = st.secrets["roboflow"]["api_key"]
-            full_url = f"{API_URL}?api_key={api_key}"
             
-            # 1. DEFINE THE JSON PAYLOAD STRUCTURE
+            # URL: Use the correct structure with the API key as a query parameter (from 401 fix)
+            full_url = f"{API_URL}?api_key={api_key}" 
+            
+            # 1. DEFINE THE CORRECT WORKFLOW PAYLOAD STRUCTURE (MUST be 'images' array)
             payload = {
-                "image": {
-                    "type": "base64",
-                    "value": image_base64  # Use the base64 string we prepared earlier
-                }
+                "images": [  # CRITICAL: Must be an array of image objects
+                    {
+                        "type": "base64",
+                        "value": image_base64
+                    }
+                ]
             }
             
-            # 2. SEND THE REQUEST WITH JSON
+            # 2. SEND THE REQUEST WITH JSON AND AUTHORIZATION HEADER
             response = requests.post(
                 full_url,
-                data=json.dumps(payload), # Use json.dumps to send the payload as a JSON string
-                # 3. CRUCIAL: Set content type to application/json
-                headers={"Content-Type": "application/json"} 
+                json=payload, # Use 'json=payload' to set Content-Type: application/json
             )
-            response.raise_for_status() 
+            response.raise_for_status()
                 
     except requests.exceptions.RequestException as e:
         # Handle connection errors, 401 Unauthorized, 404 Not Found, etc.
@@ -66,6 +68,7 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
 
 
 
