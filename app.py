@@ -22,30 +22,30 @@ if uploaded_file is not None:
     # Convert image bytes to a base64 string, as required by the Roboflow API body
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-    # --- 4. API CALL TO ROBOFLOW (DEFINITIVE WORKFLOW PAYLOAD & URL) ---
-    try:
-        with st.spinner('Sending image to Vision AI for counting...'):
-            api_key = st.secrets["roboflow"]["api_key"]
-            
-            # URL: Use the correct structure with the API key as a query parameter (from 401 fix)
-            full_url = f"{API_URL}?api_key={api_key}" 
-            
-            # 1. DEFINE THE CORRECT WORKFLOW PAYLOAD STRUCTURE (MUST be 'images' array)
-            payload = {
-                "images": [  # CRITICAL: Must be an array of image objects
-                    {
-                        "type": "base64",
-                        "value": image_base64
-                    }
-                ]
+    # --- 4. API CALL TO ROBOFLOW (FINAL DEFINITIVE FIX) ---
+    # The URL remains the same (Correct query parameter fixed the 401)
+    full_url = f"{API_URL}?api_key={api_key}" 
+    
+    # 1. DEFINE THE CORRECT WORKFLOW PAYLOAD STRUCTURE
+    # CRITICAL: Roboflow often requires the data to be nested under "inputs"
+    # AND the API key must sometimes be included in the body for the Workflow API.
+    payload = {
+        # This key is often REQUIRED for Workflow API payload (even if in URL)
+        "api_key": api_key, 
+        "inputs": [ # CRITICAL: This key replaces "images"
+            {
+                "type": "base64",
+                "value": image_base64
             }
-            
-            # 2. SEND THE REQUEST WITH JSON AND AUTHORIZATION HEADER
-            response = requests.post(
-                full_url,
-                json=payload, # Use 'json=payload' to set Content-Type: application/json
-            )
-            response.raise_for_status()
+        ]
+    }
+    
+    # 2. SEND THE REQUEST WITH JSON 
+    response = requests.post(
+        full_url,
+        json=payload, # Use 'json=payload' to set Content-Type: application/json
+    )
+    response.raise_for_status()
                 
     except requests.exceptions.RequestException as e:
         # Handle connection errors, 401 Unauthorized, 404 Not Found, etc.
@@ -68,6 +68,7 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
 
 
 
