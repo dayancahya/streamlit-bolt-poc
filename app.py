@@ -32,12 +32,12 @@ if uploaded_file is not None:
             # 1. DEFINE THE CORRECT WORKFLOW PAYLOAD STRUCTURE (Final best guess for 422 fix)
             # This structure uses the 'inputs' array wrapper and omits the redundant api_key from the body.
             payload = {
-                "inputs": [
-                    {
+                "inputs": {
+                    "image": { # <-- Assume 'image' is the name of your first workflow input variable
                         "type": "base64",
                         "value": image_base64
                     }
-                ]
+                }
             }
             
             # 2. SEND THE REQUEST WITH JSON 
@@ -69,3 +69,4 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Raw API Response (JSON):**")
     # st.json(data)
+
