@@ -22,25 +22,29 @@ if uploaded_file is not None:
     # Convert image bytes to a base64 string, as required by the Roboflow API body
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-    # --- 4. API CALL TO ROBOFLOW ---
-    try:
-        with st.spinner('Sending image to Vision AI for counting...'):
-            # Securely retrieve the API Key from the Streamlit secrets
-            api_key = st.secrets["roboflow"]["api_key"]
-            
-            # Construct the final URL with the API Key appended as a query parameter
-            # Add parameters using standard URL format (using '?')
-            full_url = f"{API_URL}?api_key={api_key}"
-            
-            # Send the base64 image string as the POST body
-            response = requests.post(
-                full_url,
-                data=image_base64, # The body of the request is the base64 string
-                # This header is crucial for Roboflow to correctly interpret the base64 body
-                headers={"Content-Type": "application/x-www-form-urlencoded"}
-            )
-            response.raise_for_status() # Raise an HTTPError for bad responses (401, 500, etc.)
-            
+    # --- 4. API CALL TO ROBOFLOW (CORRECTED FOR JSON PAYLOAD) ---
+        try:
+            with st.spinner('Sending image to Vision AI for counting...'):
+                api_key = st.secrets["roboflow"]["api_key"]
+                full_url = f"{API_URL}?api_key={api_key}"
+                
+                # 1. DEFINE THE JSON PAYLOAD STRUCTURE
+                payload = {
+                    "image": {
+                        "type": "base64",
+                        "value": image_base64  # Use the base64 string we prepared earlier
+                    }
+                }
+                
+                # 2. SEND THE REQUEST WITH JSON
+                response = requests.post(
+                    full_url,
+                    data=json.dumps(payload), # Use json.dumps to send the payload as a JSON string
+                    # 3. CRUCIAL: Set content type to application/json
+                    headers={"Content-Type": "application/json"} 
+                )
+                response.raise_for_status() 
+                
     except requests.exceptions.RequestException as e:
         # Handle connection errors, 401 Unauthorized, 404 Not Found, etc.
         st.error(f"❌ API Communication Error. Please check your API Key and URL.")
@@ -62,5 +66,6 @@ if uploaded_file is not None:
     # Optional: Display the raw predictions array (uncomment for debugging)
     # st.markdown(f"**Individual Predictions (JSON):**")
     # st.json(predictions)
+
 
 
